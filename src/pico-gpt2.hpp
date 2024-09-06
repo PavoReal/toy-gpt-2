@@ -6,6 +6,7 @@ namespace pico_gpt2
 {
     //
     // GELU
+    // https://arxiv.org/pdf/1606.08415
     //
     inline double 
     gelu(double x)
