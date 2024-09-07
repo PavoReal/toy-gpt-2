@@ -81,11 +81,9 @@ main(int, char**)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    
-
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
+    // ImGui::StyleColorsDark();
+    ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
@@ -98,19 +96,20 @@ main(int, char**)
     // Main loop
     bool done = false;
 
-    double gelu_min  = -4.0;
-    double gelu_max  = 3.0;
-    double gelu_step = 0.1;
+    //
+    // GELU
+    //
+    double gelu_step = 0.001;
 
-    auto gelu_points = generate_gelu_points(gelu_min, gelu_max, gelu_step);
+    ImPlotRect gelu_limits(-4.0, 4.0, -1.0, 1.0);
+    auto gelu_points = generate_gelu_points(gelu_limits.X.Min, gelu_limits.X.Max, gelu_step);
 
-    std::vector<double> gelu_points_x;
-    gelu_points_x.reserve((size_t)((gelu_max - gelu_min) / gelu_step));
-
-    for (auto x = gelu_min; x <= gelu_max; x += gelu_step)
-    {
-        gelu_points_x.push_back(x);
-    }
+    //
+    // SOFTMAX
+    //
+    auto softmax_gradient = generate_linear_gradient(0.0, 1.0, 0.01);
+    auto softmax_points   = generate_softmax_points(softmax_gradient);
+    ImPlotRect softmax_limits;
 
     while (!done)
     {
@@ -136,43 +135,41 @@ main(int, char**)
         ImGui::NewFrame();
 
         {
+            // ImGui::ShowDemoWindow();
+
             if (ImGui::Begin("Function Visualizer"))
             {
-                bool regenerate = false;
-
-                constexpr double gelu_min_tmp      = -100;
-                constexpr double gelu_max_tmp      = 100;
-                constexpr double gelu_step_min_tmp = 0.001;
-                constexpr double gelu_step_max_tmp = 2.0;
-
-                regenerate |= ImGui::SliderScalar("Min",  ImGuiDataType_Double, &gelu_min,  &gelu_min_tmp,      &gelu_max_tmp);
-                regenerate |= ImGui::SliderScalar("Max",  ImGuiDataType_Double, &gelu_max,  &gelu_min_tmp,      &gelu_max_tmp);
-                regenerate |= ImGui::SliderScalar("Step", ImGuiDataType_Double, &gelu_step, &gelu_step_min_tmp, &gelu_step_max_tmp);
-
-                if (regenerate)
+                if (ImGui::CollapsingHeader("GELU"))
                 {
-                    if (gelu_min > gelu_max)
+                    if (ImGui::Button("Center"))
                     {
-                        gelu_min = gelu_max;
+                        ImPlot::SetNextAxesLimits(gelu_limits.X.Min, gelu_limits.X.Max, gelu_limits.Y.Min, gelu_limits.Y.Max);
                     }
 
-                    gelu_points = generate_gelu_points(gelu_min, gelu_max, gelu_step);
-
-                    gelu_points_x.reserve((size_t)((gelu_max - gelu_min) / gelu_step));
-
-                    for (auto x = gelu_min; x <= gelu_max; x += gelu_step)
+                    if (ImPlot::BeginPlot("GELU PLOT", ImVec2(0, 0), ImPlotFlags_NoLegend))
                     {
-                        gelu_points_x.push_back(x);
+                        ImPlot::SetupAxis(ImAxis_X1, "");
+                        ImPlot::SetupAxis(ImAxis_Y1, "");
+                        ImPlot::SetupAxisLimits(ImAxis_X1, gelu_limits.X.Min, gelu_limits.X.Max);
+                        ImPlot::SetupAxisLimits(ImAxis_Y1, gelu_limits.Y.Min, gelu_limits.Y.Max);
+                        ImPlot::SetupFinish();
+
+                        ImPlot::PlotLine("GELU PLOT DATA", gelu_points.first.data(), gelu_points.second.data(), (int) gelu_points.first.size());
+                        ImPlot::EndPlot();
                     }
                 }
 
-                ImPlot::BeginPlot("GELU");
-                ImPlot::PlotLine("GELU_Plot", gelu_points_x.data(), gelu_points.data(), (int) gelu_points_x.size());
-                ImPlot::EndPlot();
+                if (ImGui::CollapsingHeader("Softmax"))
+                {
+                    if (ImPlot::BeginPlot("Softmax"))
+                    {
+                        ImPlot::PlotLine("Softmax", softmax_points.first.data(), softmax_points.second.data(), (int) softmax_points.first.size());
+                        ImPlot::EndPlot();
+                    }
+                }
             }
             ImGui::End();
         }
-
 
         // Rendering
         ImGui::Render();

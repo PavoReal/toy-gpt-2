@@ -31,6 +31,7 @@ git submodule update --init --recursive
 The dependencies are:
 - [SDL2](https://github.com/libsdl-org/SDL/tree/SDL2)
 - [IMGUI](https://github.com/ocornut/imgui)
+- [ImPlot](https://github.com/epezent/implot)
 
 ## Building
 CMake is used as the build system and *should* handle everything. To build, initalize submodules and run the following:

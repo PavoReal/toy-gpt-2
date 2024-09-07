@@ -18,6 +18,7 @@ set(imgui_srcs
     deps/imgui/imgui_widgets.cpp
     deps/imgui/backends/imgui_impl_sdl2.cpp
     deps/imgui/backends/imgui_impl_opengl3.cpp
+    # deps/imgui/imgui_demo.cpp
 )
 
 set(implot_srcs
