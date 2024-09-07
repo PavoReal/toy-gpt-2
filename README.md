@@ -19,6 +19,7 @@ A toy implementation of GPT-2 written in C++ for my own learning purposes. SDL/I
     - [ ] Attention
     - [ ] MHA
 - [ ] Implement GPT-2 model
+- [ ] Implement SIMD math functions
 
 ## Dependencies
 All dependencies are git submodules within `deps` directory.

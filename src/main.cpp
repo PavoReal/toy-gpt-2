@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
+#include "implot.h"
 
 #include <stdio.h>
 
@@ -72,10 +73,15 @@ main(int, char**)
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
+
     ImGui::CreateContext();
+    ImPlot::CreateContext();
+
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -92,11 +98,19 @@ main(int, char**)
     // Main loop
     bool done = false;
 
-    float gelu_min  = -4.0f;
-    float gelu_max  = 3.0f;
-    float gelu_step = 0.1f;
+    double gelu_min  = -4.0;
+    double gelu_max  = 3.0;
+    double gelu_step = 0.1;
 
-    std::vector<float> points = generate_gelu_points(gelu_min, gelu_max, gelu_step);
+    auto gelu_points = generate_gelu_points(gelu_min, gelu_max, gelu_step);
+
+    std::vector<double> gelu_points_x;
+    gelu_points_x.reserve((size_t)((gelu_max - gelu_min) / gelu_step));
+
+    for (auto x = gelu_min; x <= gelu_max; x += gelu_step)
+    {
+        gelu_points_x.push_back(x);
+    }
 
     while (!done)
     {
@@ -122,13 +136,18 @@ main(int, char**)
         ImGui::NewFrame();
 
         {
-            if (ImGui::Begin("GELU"))
+            if (ImGui::Begin("Function Visualizer"))
             {
                 bool regenerate = false;
 
-                regenerate |= ImGui::SliderFloat("Min",  &gelu_min,  -100, 100);
-                regenerate |= ImGui::SliderFloat("Max",  &gelu_max,  -100, 100);
-                regenerate |= ImGui::SliderFloat("Step", &gelu_step, 0.001f, 1.0f);
+                constexpr double gelu_min_tmp      = -100;
+                constexpr double gelu_max_tmp      = 100;
+                constexpr double gelu_step_min_tmp = 0.001;
+                constexpr double gelu_step_max_tmp = 2.0;
+
+                regenerate |= ImGui::SliderScalar("Min",  ImGuiDataType_Double, &gelu_min,  &gelu_min_tmp,      &gelu_max_tmp);
+                regenerate |= ImGui::SliderScalar("Max",  ImGuiDataType_Double, &gelu_max,  &gelu_min_tmp,      &gelu_max_tmp);
+                regenerate |= ImGui::SliderScalar("Step", ImGuiDataType_Double, &gelu_step, &gelu_step_min_tmp, &gelu_step_max_tmp);
 
                 if (regenerate)
                 {
@@ -137,12 +156,19 @@ main(int, char**)
                         gelu_min = gelu_max;
                     }
 
-                    points = generate_gelu_points(gelu_min, gelu_max, gelu_step);
+                    gelu_points = generate_gelu_points(gelu_min, gelu_max, gelu_step);
+
+                    gelu_points_x.reserve((size_t)((gelu_max - gelu_min) / gelu_step));
+
+                    for (auto x = gelu_min; x <= gelu_max; x += gelu_step)
+                    {
+                        gelu_points_x.push_back(x);
+                    }
                 }
 
-                ImGui::PlotLines("GELU", points.data(), (int) points.size(), 0, nullptr, gelu_min, gelu_max, ImVec2(500, 500));
-
-                
+                ImPlot::BeginPlot("GELU");
+                ImPlot::PlotLine("GELU_Plot", gelu_points_x.data(), gelu_points.data(), (int) gelu_points_x.size());
+                ImPlot::EndPlot();
             }
             ImGui::End();
         }
@@ -160,6 +186,8 @@ main(int, char**)
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
+
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 
     SDL_GL_DeleteContext(gl_context);

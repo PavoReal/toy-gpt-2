@@ -12,17 +12,16 @@ struct shared_state
     std::atomic<bool> running;
 };
 
-std::vector<float>
-generate_gelu_points(float start, float stop, float step)
+std::vector<double>
+generate_gelu_points(double start, double stop, double step)
 {
-    std::vector<float> points;
+    std::vector<double> points;
     points.reserve((size_t)((stop - start) / step));
 
-    for (float x = start; x <= stop; x += step)
+    for (auto x = start; x <= stop; x += step)
     {
-        points.push_back((float) pico_gpt2::gelu(x));
+        points.push_back(pico_gpt2::gelu(x));
     }
 
     return points;
 }
-
