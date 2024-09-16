@@ -107,8 +107,15 @@ main(int, char**)
     //
     // SOFTMAX
     //
-    auto softmax_gradient = generate_linear_gradient(0.0, 1.0, 0.01);
-    auto softmax_points   = generate_softmax_points(softmax_gradient);
+    double softmax_gradient_start = 0.0;
+    double softmax_gradient_stop  = 1.0;
+    double softmax_gradient_step  = 0.01;
+
+    std::pair<std::vector<double>, std::vector<double>> softmax_points;
+
+    softmax_points.first  = generate_linear_gradient(softmax_gradient_start, softmax_gradient_stop, softmax_gradient_step);
+    softmax_points.second = generate_softmax_points(softmax_points.first);
+
     ImPlotRect softmax_limits;
 
     while (!done)
@@ -161,6 +168,28 @@ main(int, char**)
 
                 if (ImGui::CollapsingHeader("Softmax"))
                 {
+                    bool regen = false;
+
+                    const double min = -10.0;
+                    const double max = 10.0;
+                    const double step_min = 0.0001;
+                    const double step_max = 0.01;
+
+                    regen |= ImGui::SliderScalar("Start", ImGuiDataType_Double, &softmax_gradient_start, &min, &max);
+                    regen |= ImGui::SliderScalar("Stop",  ImGuiDataType_Double, &softmax_gradient_stop,  &min, &max);
+                    regen |= ImGui::SliderScalar("Step",  ImGuiDataType_Double, &softmax_gradient_step,  &step_min, &step_max);
+
+                    if (softmax_gradient_start > softmax_gradient_stop)
+                    {
+                        softmax_gradient_start = softmax_gradient_stop;
+                    }
+
+                    if (regen)
+                    {
+                        softmax_gradient = generate_linear_gradient(softmax_gradient_start, softmax_gradient_stop, softmax_gradient_step);
+                        softmax_points   = generate_softmax_points(softmax_gradient);
+                    }
+    
                     if (ImPlot::BeginPlot("Softmax"))
                     {
                         ImPlot::PlotLine("Softmax", softmax_points.first.data(), softmax_points.second.data(), (int) softmax_points.first.size());
