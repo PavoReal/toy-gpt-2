@@ -2,7 +2,6 @@
 
 #include "pico-gpt2.hpp"
 
-#include <atomic>
 #include <vector>
 
 #include "imgui.h"
@@ -51,3 +50,12 @@ generate_softmax_points(const std::vector<double> &input)
     return {x_points, y_points};
 }
 
+inline std::pair<std::vector<double>, std::vector<double>> 
+generate_layer_norm_points(const std::vector<double> &x, 
+                           const std::vector<double> &gamma, 
+                           const std::vector<double> &beta) 
+{
+    std::vector<double> y = pico_gpt2::layer_norm(x, gamma, beta);
+
+    return {x, y};
+}

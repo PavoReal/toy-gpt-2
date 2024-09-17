@@ -7,3 +7,6 @@
 [submodule "deps/implot"]
 	path = deps/implot
 	url = https://github.com/epezent/implot.git
+[submodule "deps/eigen"]
+	path = deps/eigen
+	url = https://gitlab.com/libeigen/eigen.git

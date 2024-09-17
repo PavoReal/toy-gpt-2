@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(SDL2_STATIC ON)
 add_subdirectory(deps/SDL)
+add_subdirectory(deps/eigen)
 
 # IMGUI sources
 set(imgui_srcs
@@ -35,5 +36,5 @@ add_compile_definitions(IMGUI_USER_CONFIG="../../src/imgui_config.h")
 add_executable(pico-gpt2-c src/main.cpp src/pico-gpt2.hpp src/utils.hpp ${imgui_srcs} ${implot_srcs})
 
 # Link OpenGL library
-target_link_libraries(pico-gpt2-c PUBLIC SDL2::SDL2-static OpenGL::GL)
-target_include_directories(pico-gpt2-c PUBLIC ${CMAKE_SOURCE_DIR}/deps/imgui ${CMAKE_SOURCE_DIR}/deps/imgui/backends ${CMAKE_SOURCE_DIR}/deps/SDL/include ${CMAKE_SOURCE_DIR}/deps/implot)
+target_link_libraries(pico-gpt2-c PUBLIC SDL2::SDL2-static OpenGL::GL Eigen3::Eigen)
+target_include_directories(pico-gpt2-c PUBLIC ${CMAKE_SOURCE_DIR}/deps/imgui ${CMAKE_SOURCE_DIR}/deps/imgui/backends ${CMAKE_SOURCE_DIR}/deps/SDL/include ${CMAKE_SOURCE_DIR}/deps/implot ${CMAKE_SOURCE_DIR}/deps/eigen)

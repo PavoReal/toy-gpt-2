@@ -111,12 +111,18 @@ main(int, char**)
     double softmax_gradient_stop  = 1.0;
     double softmax_gradient_step  = 0.01;
 
-    std::pair<std::vector<double>, std::vector<double>> softmax_points;
-
-    softmax_points.first  = generate_linear_gradient(softmax_gradient_start, softmax_gradient_stop, softmax_gradient_step);
-    softmax_points.second = generate_softmax_points(softmax_points.first);
+    auto softmax_points = generate_softmax_points(generate_linear_gradient(softmax_gradient_start, softmax_gradient_stop, softmax_gradient_step));
 
     ImPlotRect softmax_limits;
+
+    //
+    // Layer Normalization
+    //
+    double layer_norm_gradient_start = 0.0;
+    double layer_norm_gradient_stop  = 1.0;
+    double layer_norm_gradient_step  = 0.01;
+
+    // auto layer_norm_points = generate_layer_norm_points(generate_linear_gradient(layer_norm_gradient_start, layer_norm_gradient_stop, layer_norm_gradient_step));
 
     while (!done)
     {
@@ -150,6 +156,7 @@ main(int, char**)
                 {
                     if (ImGui::Button("Center"))
                     {
+                        // TODO: This is not working
                         ImPlot::SetNextAxesLimits(gelu_limits.X.Min, gelu_limits.X.Max, gelu_limits.Y.Min, gelu_limits.Y.Max);
                     }
 
@@ -186,13 +193,21 @@ main(int, char**)
 
                     if (regen)
                     {
-                        softmax_gradient = generate_linear_gradient(softmax_gradient_start, softmax_gradient_stop, softmax_gradient_step);
-                        softmax_points   = generate_softmax_points(softmax_gradient);
+                        softmax_points = generate_softmax_points(generate_linear_gradient(softmax_gradient_start, softmax_gradient_stop, softmax_gradient_step));
                     }
     
                     if (ImPlot::BeginPlot("Softmax"))
                     {
                         ImPlot::PlotLine("Softmax", softmax_points.first.data(), softmax_points.second.data(), (int) softmax_points.first.size());
+                        ImPlot::EndPlot();
+                    }
+                }
+
+                if (ImGui::CollapsingHeader("Layer Normalization"))
+                {
+                    if (ImPlot::BeginPlot("Layer Normalization"))
+                    {
+                        // ImPlot::PlotLine("Layer Normalization", layer_norm_points.first.data(), layer_norm_points.second.data(), (int) layer_norm_points.first.size());
                         ImPlot::EndPlot();
                     }
                 }

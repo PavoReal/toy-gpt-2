@@ -4,12 +4,14 @@ A toy implementation of GPT-2 written in C++ for my own learning purposes. SDL/I
 ## TODO
 - [ ] Implement very simple versions of math functions
     - [X] GELU
-    - [ ] Softmax
-    - [ ] Layer Normalization
-    - [ ] Linear
-    - [ ] FFN
-    - [ ] Attention
-    - [ ] MHA
+    - [X] Softmax
+    - [X] Layer Normalization
+    - [X] Linear
+    - [X] FFN
+    - [X] Attention
+    - [X] MHA
+    - [ ] Transformer Block
+    - [ ] GPT-2 Model
 - [ ] Implement visualization for math functions
     - [X] GELU
     - [ ] Softmax
